@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#160b11">
+    <title>Gallery Terms and Conditions</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            color-scheme: dark;
+            --paper: #160b11;
+            --plum: #fff1f6;
+            --rose: #ff5b9b;
+            --muted: #c9a3b3;
+            --serif: "Cormorant Garamond", Georgia, serif;
+            --sans: "DM Sans", sans-serif;
+        }
+        * { box-sizing: border-box; }
+        body {
+            min-height: 100svh;
+            margin: 0;
+            padding: 32px 20px;
+            background: radial-gradient(ellipse at 8% 10%, rgba(180, 25, 83, .2), transparent 31rem), var(--paper);
+            color: var(--plum);
+            font-family: var(--sans);
+            line-height: 1.65;
+        }
+        main { width: min(680px, 100%); margin: 5vh auto; }
+        .eyebrow { color: var(--rose); font-size: 10px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; }
+        h1, h2 { font-family: var(--serif); font-weight: 500; line-height: 1.1; }
+        h1 { margin: 0 0 24px; font-size: clamp(2.7rem, 8vw, 4rem); }
+        h2 { margin: 28px 0 7px; font-size: 1.7rem; }
+        p, li { color: var(--muted); }
+        a { color: var(--rose); }
+        .back-link { display: inline-block; margin-top: 24px; }
+    </style>
+</head>
+<body>
+    <main>
+        <p class="eyebrow">Gallery information</p>
+        <h1>Terms and Conditions</h1>
+        <p>These terms explain the optional activity tracking used by this personal gallery.</p>
+
+        <h2>What is recorded</h2>
+        <p>If you check “I agree to the Terms and Conditions” before opening the gallery, the site records:</p>
+        <ul>
+            <li>When you enter the gallery.</li>
+            <li>Whether you choose Yes or No in the gallery prompt.</li>
+            <li>Your IP address, derived by the server from the request, and a broad device/browser category.</li>
+            <li>Your device model when the browser makes it available.</li>
+        </ul>
+        <p>These details and your answer are visible to the site administrator in the private dashboard. Device and browser information can be approximate; a specific device model may not be available.</p>
+
+        <h2>Tracking is optional</h2>
+        <p>The tracking checkbox starts unchecked. You can open the gallery and use its prompt without checking it; in that case, this site does not send gallery entry or Yes/No activity to its tracking endpoint.</p>
+        <p>Leaving the checkbox unchecked does not prevent the site or hosting provider from processing ordinary network requests needed to deliver the page.</p>
+
+        <h2>Personal project</h2>
+        <p>This is a personal project, not an official service. The administrator is responsible for access to and handling of activity shown in the dashboard. Do not check the box if you do not want your gallery visit and answer associated with the details listed above.</p>
+
+        <a class="back-link" href="index.html">Back to the gallery</a>
+    </main>
+</body>
+</html>

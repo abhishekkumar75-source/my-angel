@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#160b11">
+    <title>Our memories</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            color-scheme: dark;
+            --paper: #160b11;
+            --plum: #fff1f6;
+            --rose: #ff5b9b;
+            --muted: #c9a3b3;
+            --line: rgba(255, 178, 207, .2);
+            --serif: "Cormorant Garamond", Georgia, serif;
+            --sans: "DM Sans", sans-serif;
+            --ease: cubic-bezier(.2, .75, .25, 1);
+        }
+        * { box-sizing: border-box; }
+        body {
+            position: relative;
+            isolation: isolate;
+            display: flex;
+            min-height: 100svh;
+            flex-direction: column;
+            margin: 0;
+            background:
+                radial-gradient(ellipse at 8% 10%, rgba(180, 25, 83, .2), transparent 31rem),
+                radial-gradient(ellipse at 94% 90%, rgba(118, 21, 58, .24), transparent 34rem),
+                linear-gradient(145deg, #1d0d16, var(--paper) 52%, #1a0b12);
+            color: var(--plum);
+            font-family: var(--sans);
+            line-height: 1.5;
+        }
+        button, a { color: inherit; font: inherit; }
+        a { text-decoration: none; }
+        button:focus-visible, a:focus-visible { outline: 2px solid var(--rose); outline-offset: 4px; }
+        .hearts {
+            position: fixed;
+            z-index: -1;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .heart {
+            position: absolute;
+            bottom: -2rem;
+            left: var(--left);
+            color: rgba(255, 91, 155, .52);
+            font-size: var(--size);
+            animation: float-heart var(--duration) var(--delay) ease-in infinite;
+            filter: drop-shadow(0 0 8px rgba(255, 62, 139, .3));
+        }
+        @keyframes float-heart {
+            0% { transform: translate3d(0, 0, 0) rotate(-12deg) scale(.8); opacity: 0; }
+            14% { opacity: .62; }
+            84% { opacity: .45; }
+            100% { transform: translate3d(var(--sway), -110vh, 0) rotate(18deg) scale(1.12); opacity: 0; }
+        }
+        body.is-locked > .topbar, body.is-locked > main { visibility: hidden; }
+        body.is-unlocking > .topbar, body.is-unlocking > main { animation: gallery-enter .65s var(--ease) both; }
+        .gate {
+            position: fixed;
+            z-index: 5;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            background: rgba(12, 5, 9, .48);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: opacity .45s ease;
+        }
+        .gate.is-unlocking { opacity: 0; pointer-events: none; }
+        .gate[hidden] { display: none; }
+        .gate-card {
+            width: min(370px, 100%);
+            border: 1px solid rgba(255, 196, 218, .24);
+            border-radius: 16px;
+            padding: clamp(25px, 7vw, 38px);
+            background: rgba(57, 20, 38, .68);
+            box-shadow: 0 25px 80px rgba(0, 0, 0, .42), inset 0 1px 0 rgba(255, 225, 237, .1);
+            backdrop-filter: blur(25px) saturate(135%);
+            -webkit-backdrop-filter: blur(25px) saturate(135%);
+            animation: gate-enter .7s var(--ease) both;
+        }
+        .gate-mark { margin: 0 0 8px; color: var(--rose); font-size: 9px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; }
+        .gate h1 { margin: 0 0 23px; font-size: clamp(2.3rem, 10vw, 3.2rem); }
+        .gate-label { display: block; margin: 0 0 8px; color: var(--muted); font-size: 11px; }
+        .gate-input {
+            display: block;
+            width: 100%;
+            min-height: 48px;
+            border: 1px solid rgba(255, 185, 211, .24);
+            border-radius: 8px;
+            padding: 0 14px;
+            background: rgba(12, 7, 11, .38);
+            color: var(--plum);
+            font: inherit;
+            outline: none;
+            transition: border-color .2s ease, box-shadow .2s ease;
+        }
+        .gate-input:focus { border-color: rgba(255, 91, 155, .78); box-shadow: 0 0 0 3px rgba(255, 91, 155, .12); }
+        .gate-input[aria-invalid="true"] { border-color: #ff7f9f; }
+        .gate-submit {
+            width: 100%;
+            min-height: 46px;
+            margin-top: 12px;
+            border: 1px solid rgba(255, 123, 174, .5);
+            border-radius: 8px;
+            background: linear-gradient(135deg, #d63277, #a91d59);
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 8px 22px rgba(161, 24, 79, .28), inset 0 1px 0 rgba(255, 255, 255, .18);
+            transition: transform .2s ease, filter .2s ease, box-shadow .2s ease;
+        }
+        .gate-submit:hover { transform: translateY(-1px); filter: brightness(1.12); box-shadow: 0 11px 26px rgba(161, 24, 79, .38); }
+        .gate-submit:active { transform: translateY(0) scale(.99); }
+        .gate-error { min-height: 1.25em; margin: 10px 0 0; color: #ff9ab6; font-size: 11px; }
+        .tracking-consent { display: flex; align-items: flex-start; gap: 9px; margin: 14px 0 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+        .tracking-consent input { flex: 0 0 auto; margin: 3px 0 0; accent-color: var(--rose); }
+        .terms-link { color: var(--rose); text-decoration: underline; text-underline-offset: 2px; }
+        @keyframes gate-enter { from { opacity: 0; transform: translateY(12px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes gallery-enter { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        .topbar {
+            display: flex;
+            width: min(1120px, 100%);
+            align-items: center;
+            justify-content: space-between;
+            margin: 0 auto;
+            padding: 26px clamp(20px, 5vw, 44px);
+        }
+        .back-link { color: var(--muted); font-size: 12px; transition: color .2s ease; }
+        .back-link:hover { color: var(--rose); }
+        .wordmark { color: var(--rose); font-family: var(--serif); font-size: 1.3rem; }
+        main {
+            display: flex;
+            width: min(1120px, 100%);
+            flex: 1;
+            flex-direction: column;
+            justify-content: center;
+            margin: 0 auto;
+            padding: clamp(14px, 3vh, 32px) clamp(18px, 5vw, 44px) 54px;
+        }
+        .intro { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin: 0 0 22px; }
+        .eyebrow { margin: 0 0 4px; color: var(--rose); font-size: 9px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; }
+        h1 { margin: 0; font-family: var(--serif); font-size: clamp(2.5rem, 6vw, 4.4rem); font-weight: 500; line-height: .98; }
+        .intro-note { max-width: 240px; margin: 0 0 3px; color: var(--muted); font-family: var(--serif); font-size: 1.12rem; font-style: italic; text-align: right; }
+        .viewer {
+            border: 1px solid rgba(255, 196, 218, .2);
+            border-radius: 17px;
+            padding: clamp(8px, 1.5vw, 15px);
+            background: rgba(57, 20, 38, .38);
+            box-shadow: 0 24px 70px rgba(0, 0, 0, .32), inset 0 1px 0 rgba(255, 225, 237, .1);
+            backdrop-filter: blur(26px) saturate(135%);
+            -webkit-backdrop-filter: blur(26px) saturate(135%);
+        }
+        .stage {
+            position: relative;
+            height: clamp(330px, 66svh, 690px);
+            overflow: hidden;
+            border-radius: 11px;
+            background: rgba(12, 7, 11, .24);
+            touch-action: pan-y;
+            user-select: none;
+        }
+        .track {
+            display: flex;
+            width: 300%;
+            height: 100%;
+            transform: translateX(-33.333333%);
+            transition: transform 560ms var(--ease);
+            will-change: transform;
+        }
+        .track.no-transition { transition: none; }
+        .slide { display: grid; flex: 0 0 33.333333%; min-width: 0; height: 100%; place-items: center; padding: 5px; }
+        .slide img {
+            display: block;
+            width: auto;
+            height: auto;
+            max-width: 100%;
+            max-height: calc(min(66svh, 690px) - 20px);
+            border-radius: 9px;
+            object-fit: contain;
+            -webkit-user-drag: none;
+            user-select: none;
+        }
+        .stage { cursor: grab; }
+        .stage.is-dragging { cursor: grabbing; }
+        .hint { margin: 13px 0 0; color: var(--muted); font-size: 10px; text-align: center; }
+        .question-card {
+            width: min(420px, 100%);
+            margin: 38px auto 0;
+            border: 1px solid rgba(255, 196, 218, .2);
+            border-radius: 12px;
+            padding: 24px;
+            background: rgba(57, 20, 38, .38);
+            text-align: center;
+        }
+        .question-trigger, .answer-button {
+            min-height: 42px;
+            border: 1px solid rgba(255, 123, 174, .5);
+            border-radius: 7px;
+            padding: 0 18px;
+            background: linear-gradient(135deg, #d63277, #a91d59);
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: filter .2s ease, transform .2s ease;
+        }
+        .question-trigger:hover, .answer-button:hover { filter: brightness(1.12); transform: translateY(-1px); }
+        .question-prompt { margin: 0 0 15px; font-family: var(--serif); font-size: 1.8rem; }
+        .question-actions { display: flex; justify-content: center; gap: 10px; }
+        .answer-button.no-button { border-color: rgba(255, 196, 218, .3); background: transparent; }
+        .question-result { min-height: 1.5em; margin: 14px 0 0; color: var(--rose); font-size: 12px; }
+        .yes-message {
+            width: min(390px, calc(100% - 32px));
+            border: 1px solid rgba(255, 196, 218, .3);
+            border-radius: 14px;
+            padding: 28px;
+            background: #391426;
+            color: var(--plum);
+            text-align: center;
+            box-shadow: 0 24px 70px rgba(0, 0, 0, .5);
+        }
+        .yes-message::backdrop { background: rgba(8, 3, 6, .72); backdrop-filter: blur(5px); }
+        .yes-message p { margin: 0 0 20px; font-family: var(--serif); font-size: 1.65rem; line-height: 1.2; }
+        [hidden] { display: none !important; }
+        @media (max-width: 600px) {
+            .topbar { padding-top: 18px; padding-bottom: 14px; }
+            main { justify-content: flex-start; padding-top: 18px; padding-bottom: 34px; }
+            .intro { align-items: start; flex-direction: column; gap: 5px; margin-bottom: 16px; }
+            .intro-note { text-align: left; }
+            .stage { height: min(63svh, 620px); min-height: 300px; }
+            .slide img { max-height: calc(min(63svh, 620px) - 20px); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+        }
+    </style>
+</head>
+<body class="is-locked">
+    <div class="hearts" id="hearts" aria-hidden="true"></div>
+    <section class="gate" id="gate" aria-labelledby="gate-title">
+        <form class="gate-card" id="gate-form" novalidate>
+            <p class="gate-mark">A private little place</p>
+            <h1 id="gate-title">Secret gallery</h1>
+            <label class="gate-label" for="gallery-password">Password</label>
+            <input class="gate-input" id="gallery-password" name="password" type="password" autocomplete="current-password" placeholder="Enter password" required autofocus>
+            <label class="tracking-consent" for="gallery-tracking-consent">
+                <input id="gallery-tracking-consent" type="checkbox">
+                <span>I agree to the <a class="terms-link" href="terms.html" target="_blank" rel="noopener">Terms and Conditions</a>, including recording my gallery visit and Yes/No answer with my IP address and device details.</span>
+            </label>
+            <button class="gate-submit" type="submit">Open gallery</button>
+            <p class="gate-error" id="gate-error" aria-live="polite"></p>
+        </form>
+    </section>
+    <header class="topbar">
+        <a class="back-link" href="../index.html">&#8592; Back to our page</a>
+        <a class="wordmark" href="../index.html" aria-label="A little love letter home">♡</a>
+    </header>
+    <main>
+        <div class="intro">
+            <div>
+                <p class="eyebrow">The little moments</p>
+                <h1>Our memories</h1>
+            </div>
+            <p class="intro-note">Every picture holds a piece of us.</p>
+        </div>
+        <section class="viewer" aria-label="Photo slideshow">
+            <div class="stage" id="stage" role="group" tabindex="0" aria-label="Photo slideshow. Swipe or use the left and right arrow keys to change photos.">
+                <div class="track no-transition" id="track" aria-live="polite"></div>
+            </div>
+        </section>
+        <p class="hint">Swipe to move through the memories.</p>
+        <section class="question-card" aria-label="A little question">
+            <button class="question-trigger" id="question-trigger" type="button" aria-expanded="false" aria-controls="question-prompt">See dih?</button>
+            <div id="question-prompt" hidden>
+                <p class="question-prompt">Are you sure, honey?</p>
+                <div class="question-actions">
+                    <button class="answer-button" type="button" data-answer="yes">Yes</button>
+                    <button class="answer-button no-button" type="button" data-answer="no">No</button>
+                </div>
+                <p class="question-result" id="question-result" aria-live="polite"></p>
+            </div>
+        </section>
+    </main>
+    <dialog class="yes-message" id="yes-message" aria-labelledby="yes-message-text">
+        <p id="yes-message-text">Just a second, honey, I will send you in WhatsApp!</p>
+        <button class="answer-button" id="yes-message-close" type="button">Okay</button>
+    </dialog>
+    <script src="../visitor-config.js"></script>
+    <script src="../device-info.js"></script>
+    <script>
+        const photos = [
+            "1125673942539149.jpg", "1421699165801119.jpg", "1027238945022502.jpg", "1048566610295026.jpg",
+            "1123224116405962.jpg", "1001188948718657.jpg", "1390169032047238.jpg", "1013054263705349.jpg",
+            "1255093619802216.jpg", "1383356716210617.jpg", "1336317471500650.jpg", "1329172948199759.jpg",
+            "1244494260575976.jpg", "1193391332153329.jpg", "1270289104376796.jpg", "1207056080894116.jpg",
+            "1127605902306269.jpg", "1519882379336103.jpg", "1191969009510156.jpg", "1199837172018622.jpg",
+            "1487533309151969.jpg", "1436467018260808.jpg", "1586802592722866.jpg", "1678534246368507.jpg",
+            "1652588372572353.jpg", "1713976019270308.jpg", "1437687384705241.jpg", "1590382721912029.jpg",
+            "1854016002199514.jpg", "1844885099560587.jpg", "1843394476259767.jpg", "1838975479963538.jpg",
+            "1838698470079120.jpg", "1882715135819228.jpg", "1881457556588193.jpg", "1918003775810157.jpg",
+            "1993814478109632.jpg", "2283050892132522.jpg", "1458993318463260.jpg", "24239047639130452.jpg",
+            "2408944332859399.jpg", "2382416985494555.jpg", "2319977108435004.jpg", "2914367122094151.jpg",
+            "25962900219999045.jpg", "1424861808803059.jpg", "3402312616587313.jpg", "4359887417589005.jpg",
+            "438548605967240.jpg", "1574610830502705.jpg", "1453344942899364.jpg", "637594632362130.jpg",
+            "484022367936659.jpg", "477606581748315.jpg", "463589733281926.jpg", "533860342920148.jpg",
+            "520263570710037.jpg", "556379933442184.jpg", "734195555939612.jpg", "725834283168864.jpg",
+            "693204783142106.jpg", "686585870903589.jpg", "680721347686455.jpg", "672378532332208.jpg",
+            "790162633889557.jpg", "783189727522769.jpg", "777735168478191.jpg", "823729180161091.jpg",
+            "802769721886732.jpg", "830643202670284.jpg", "622757697442105.jpg", "887992724239943.jpg",
+            "885232723996633.jpg", "858925482291462.jpg", "845695944650230.jpg", "844801335239691.jpg",
+            "842828438194320.jpg", "919018100324941.jpg", "890606170486233.jpg", "889237003607410.jpg",
+            "960176593625397.jpg", "996849375898800.jpg"
+        ];
+        const track = document.getElementById("track");
+        const stage = document.getElementById("stage");
+        const hearts = document.getElementById("hearts");
+        const gate = document.getElementById("gate");
+        const gateForm = document.getElementById("gate-form");
+        const passwordInput = document.getElementById("gallery-password");
+        const gateError = document.getElementById("gate-error");
+        const trackingConsent = document.getElementById("gallery-tracking-consent");
+        const questionTrigger = document.getElementById("question-trigger");
+        const questionPrompt = document.getElementById("question-prompt");
+        const questionResult = document.getElementById("question-result");
+        const yesMessage = document.getElementById("yes-message");
+        const yesMessageClose = document.getElementById("yes-message-close");
+        const config = window.VISITOR_CONFIG || {};
+        const projectUrl = (config.supabaseUrl || "").replace(/\/+$/, "");
+        const publicKey = config.supabaseAnonKey || "";
+        const trackingConfigured = /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(projectUrl) && publicKey.length > 20;
+        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        let order = photos.map((_, index) => index);
+        let position = 0;
+        let moving = false;
+        let startX = null;
+        let transitionFallback;
+        let trackingAllowed = false;
+
+        trackingConsent.checked = false;
+
+        async function logGalleryActivity(type, answer) {
+            if (!trackingConfigured) throw new Error("Tracking isn't configured.");
+            const deviceInfo = await window.getDeviceInfo();
+            const response = await fetch(`${projectUrl}/functions/v1/log-activity`, {
+                method: "POST",
+                headers: { apikey: publicKey, "Content-Type": "application/json" },
+                body: JSON.stringify({ type, answer, ...deviceInfo })
+            });
+            if (!response.ok) {
+                const result = await response.json().catch(() => ({}));
+                const message = result.error || result.message || result.msg || `Request failed (${response.status}).`;
+                throw new Error(`Activity could not be recorded: ${message}`);
+            }
+        }
+
+        questionTrigger.addEventListener("click", () => {
+            questionPrompt.hidden = false;
+            questionTrigger.setAttribute("aria-expanded", "true");
+            questionPrompt.querySelector("[data-answer='yes']").focus();
+        });
+        questionPrompt.querySelectorAll("[data-answer]").forEach(button => {
+            button.addEventListener("click", async () => {
+                const answer = button.dataset.answer;
+                const answerButtons = questionPrompt.querySelectorAll("[data-answer]");
+                answerButtons.forEach(answerButton => { answerButton.disabled = true; });
+                if (trackingAllowed) {
+                    questionResult.textContent = "Saving your choice…";
+                    try {
+                        await logGalleryActivity("gallery_prompt_response", answer);
+                        questionResult.textContent = "Your choice was saved.";
+                    } catch (error) {
+                        questionResult.textContent = error instanceof Error
+                            ? `${error.message} Your choice wasn't saved.`
+                            : "Your choice wasn't saved.";
+                        answerButtons.forEach(answerButton => { answerButton.disabled = false; });
+                        return;
+                    }
+                } else {
+                    questionResult.textContent = answer === "yes" ? "You chose yes, honey." : "No worries, honey.";
+                }
+                if (answer === "yes") yesMessage.showModal();
+            });
+        });
+        yesMessageClose.addEventListener("click", () => yesMessage.close());
+        yesMessage.addEventListener("close", () => {
+            questionPrompt.querySelector("[data-answer='yes']").focus();
+        });
+
+        for (let index = order.length - 1; index > 0; index--) {
+            const randomIndex = Math.floor(Math.random() * (index + 1));
+            [order[index], order[randomIndex]] = [order[randomIndex], order[index]];
+        }
+
+        const wrap = index => (index + order.length) % order.length;
+        function photoPath(positionOffset) {
+            return photos[order[wrap(position + positionOffset)]];
+        }
+        function renderSlides() {
+            track.replaceChildren();
+            for (const offset of [-1, 0, 1]) {
+                const slide = document.createElement("div");
+                slide.className = "slide";
+                slide.setAttribute("aria-hidden", String(offset !== 0));
+                const image = document.createElement("img");
+                image.src = photoPath(offset);
+                image.alt = offset === 0 ? "A moment from our memories" : "";
+                image.draggable = false;
+                slide.append(image);
+                track.append(slide);
+            }
+        }
+        function finishTransition() {
+            if (!moving) return;
+            window.clearTimeout(transitionFallback);
+            moving = false;
+            track.classList.add("no-transition");
+            track.style.transform = "translateX(-33.333333%)";
+            renderSlides();
+        }
+        function move(direction) {
+            if (moving) return;
+            moving = true;
+            track.classList.remove("no-transition");
+            track.style.transform = direction > 0 ? "translateX(-66.666667%)" : "translateX(0%)";
+            position = wrap(position + direction);
+            transitionFallback = window.setTimeout(finishTransition, reducedMotion ? 20 : 700);
+        }
+        track.addEventListener("transitionend", event => {
+            if (event.propertyName !== "transform" || !moving) return;
+            finishTransition();
+        });
+        stage.addEventListener("pointerdown", event => {
+            startX = event.clientX;
+            stage.classList.add("is-dragging");
+        });
+        window.addEventListener("pointerup", event => {
+            if (startX === null) return;
+            const distance = event.clientX - startX;
+            startX = null;
+            if (Math.abs(distance) > 45) move(distance < 0 ? 1 : -1);
+            stage.classList.remove("is-dragging");
+        });
+        window.addEventListener("pointercancel", () => {
+            startX = null;
+            stage.classList.remove("is-dragging");
+        });
+        stage.addEventListener("keydown", event => {
+            if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
+                event.preventDefault();
+                move(event.key === "ArrowRight" ? 1 : -1);
+            }
+        });
+
+        if (!reducedMotion) {
+            for (let index = 0; index < 14; index++) {
+                const heart = document.createElement("span");
+                heart.className = "heart";
+                heart.textContent = index % 3 === 0 ? "♥" : "♡";
+                heart.style.setProperty("--left", `${Math.random() * 100}%`);
+                heart.style.setProperty("--size", `${12 + Math.random() * 17}px`);
+                heart.style.setProperty("--duration", `${14 + Math.random() * 13}s`);
+                heart.style.setProperty("--delay", `${-Math.random() * 26}s`);
+                heart.style.setProperty("--sway", `${-45 + Math.random() * 90}px`);
+                hearts.append(heart);
+            }
+        }
+
+        passwordInput.addEventListener("input", () => {
+            passwordInput.removeAttribute("aria-invalid");
+            gateError.textContent = "";
+        });
+        gateForm.addEventListener("submit", async event => {
+            event.preventDefault();
+            if (passwordInput.value !== "angel") {
+                passwordInput.setAttribute("aria-invalid", "true");
+                gateError.textContent = "That password isn't right. Try again.";
+                passwordInput.select();
+                return;
+            }
+            trackingAllowed = trackingConsent.checked;
+            if (trackingAllowed) {
+                const submitButton = gateForm.querySelector(".gate-submit");
+                submitButton.disabled = true;
+                submitButton.textContent = "Recording visit…";
+                try {
+                    await logGalleryActivity("gallery_entry");
+                } catch (error) {
+                    gateError.textContent = error instanceof Error
+                        ? `${error.message} Uncheck tracking to enter without recording activity.`
+                        : "The visit could not be recorded. Uncheck tracking to enter without recording activity.";
+                    submitButton.disabled = false;
+                    submitButton.textContent = "Open gallery";
+                    trackingAllowed = false;
+                    return;
+                }
+                submitButton.disabled = false;
+                submitButton.textContent = "Open gallery";
+            }
+            gate.inert = true;
+            gate.classList.add("is-unlocking");
+            document.body.classList.remove("is-locked");
+            document.body.classList.add("is-unlocking");
+            renderSlides();
+            window.requestAnimationFrame(() => track.classList.remove("no-transition"));
+            window.setTimeout(() => {
+                gate.hidden = true;
+                document.body.classList.remove("is-unlocking");
+                stage.focus({ preventScroll: true });
+            }, 460);
+        });
+    </script>
+</body>
+</html>

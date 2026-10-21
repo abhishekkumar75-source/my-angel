@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f6f7f3">
+    <title>Visitor log | Private dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            color-scheme: light;
+            --paper: #f6f7f3;
+            --surface: #fff;
+            --ink: #26332d;
+            --muted: #728077;
+            --line: #dfe5dd;
+            --green: #315c49;
+            --green-deep: #244738;
+            --coral: #bd5d48;
+            --serif: "Cormorant Garamond", Georgia, serif;
+            --sans: "DM Sans", sans-serif;
+        }
+        * { box-sizing: border-box; }
+        body { min-width: 320px; min-height: 100vh; margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 14px; line-height: 1.55; }
+        button, input { font: inherit; }
+        a { color: inherit; }
+        button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid var(--coral); outline-offset: 3px; }
+        .topbar { display: flex; min-height: 72px; align-items: center; justify-content: space-between; gap: 20px; border-bottom: 1px solid var(--line); padding: 0 clamp(20px, 6vw, 84px); background: rgba(255,255,255,.68); }
+        .wordmark { display: flex; align-items: center; gap: 11px; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+        .wordmark-mark { display: grid; width: 28px; height: 28px; place-items: center; border: 1px solid #c7d4c8; border-radius: 50%; color: var(--coral); font-size: 15px; }
+        .topbar-link { color: var(--muted); font-size: 12px; text-decoration: none; }
+        .topbar-link:hover { color: var(--green); }
+        main { width: min(1000px, calc(100% - 40px)); margin: 0 auto; padding: clamp(54px, 9vw, 106px) 0 80px; }
+        .eyebrow { margin: 0 0 12px; color: var(--coral); font-size: 10px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
+        h1, h2 { margin: 0; font-family: var(--serif); font-weight: 500; }
+        h1 { font-size: clamp(3rem, 8vw, 5.2rem); line-height: .92; }
+        .intro { max-width: 600px; margin: 16px 0 0; color: var(--muted); }
+        .rule { height: 1px; margin: 38px 0 30px; background: var(--line); }
+        .signin { width: min(420px, 100%); padding-top: 10px; animation: rise-in .55s ease both; }
+        .signin h2 { margin-bottom: 5px; font-size: 2rem; }
+        .signin-copy { margin: 0 0 24px; color: var(--muted); font-size: 13px; }
+        .field { display: grid; gap: 7px; margin-bottom: 16px; }
+        .field label { font-size: 11px; font-weight: 600; }
+        .field input { width: 100%; min-height: 46px; border: 1px solid var(--line); border-radius: 3px; padding: 0 12px; background: var(--surface); color: var(--ink); }
+        .field input::placeholder { color: #9aa59c; }
+        .primary-button, .quiet-button { min-height: 42px; border: 1px solid var(--green); border-radius: 3px; padding: 0 16px; cursor: pointer; }
+        .primary-button { background: var(--green); color: white; }
+        .primary-button:hover { background: var(--green-deep); }
+        .quiet-button { background: transparent; color: var(--green); }
+        .quiet-button:hover { background: #edf1eb; }
+        button:disabled { opacity: .58; cursor: wait; }
+        .message { min-height: 22px; margin: 11px 0 0; color: var(--coral); font-size: 12px; }
+        .setup-note { margin-top: 26px; border-left: 2px solid #c9d6c9; padding: 3px 0 3px 13px; color: var(--muted); font-size: 12px; }
+        .dashboard[hidden], .signin[hidden] { display: none; }
+        .dashboard { animation: rise-in .45s ease both; }
+        .dashboard-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; }
+        .dashboard-head h2 { font-size: clamp(2.6rem, 6vw, 3.7rem); line-height: .98; }
+        .dashboard-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+        .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 35px 0 46px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+        .stat { min-height: 108px; padding: 19px 22px 18px 0; }
+        .stat + .stat { border-left: 1px solid var(--line); padding-left: 22px; }
+        .stat-label { display: block; color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: .13em; text-transform: uppercase; }
+        .stat-value { display: block; margin-top: 7px; color: var(--green); font-family: var(--serif); font-size: 2.5rem; line-height: 1; }
+        .stat-value.latest { font-family: var(--sans); font-size: 13px; line-height: 1.5; }
+        .visits-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 13px; }
+        .visits-head h3 { margin: 0; font-size: 14px; font-weight: 600; }
+        .visits-head p { margin: 0; color: var(--muted); font-size: 11px; }
+        .attempts-section { margin-top: 48px; }
+        .table-wrap { overflow-x: auto; border-top: 1px solid var(--line); }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { padding: 12px 14px 11px 0; color: var(--muted); font-size: 9px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
+        td { border-top: 1px solid var(--line); padding: 15px 14px 15px 0; font-size: 13px; }
+        td:last-child, th:last-child { padding-right: 0; }
+        .empty { padding: 28px 0; color: var(--muted); text-align: center; }
+        .privacy { margin-top: 22px; color: var(--muted); font-size: 11px; }
+        footer { border-top: 1px solid var(--line); padding: 21px 20px 26px; color: var(--muted); font-size: 10px; text-align: center; }
+        @keyframes rise-in { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 600px) {
+            .topbar { min-height: 62px; padding-inline: 18px; }
+            main { width: calc(100% - 36px); padding-top: 58px; }
+            .dashboard-head { align-items: flex-start; flex-direction: column; }
+            .stats { margin: 27px 0 36px; }
+            .stat { padding-right: 12px; }
+            .stat + .stat { padding-left: 14px; }
+            .stat-value.latest { font-size: 11px; }
+            th { font-size: 8px; }
+            td { font-size: 12px; }
+        }
+        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; } }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="wordmark"><span class="wordmark-mark" aria-hidden="true">♡</span> Private space</div>
+        <a class="topbar-link" href="../index.html">Back to the letter</a>
+    </header>
+    <main>
+        <p class="eyebrow">A private overview</p>
+        <h1>Your visitors</h1>
+        <p class="intro">A quiet record of visit activity, including the device/browser category and model when available.</p>
+        <div class="rule" aria-hidden="true"></div>
+
+        <section class="signin" id="signin" aria-labelledby="signin-title">
+            <h2 id="signin-title">Sign in</h2>
+            <p class="signin-copy">Use the administrator email and password created in Supabase.</p>
+            <form id="signin-form">
+                <div class="field">
+                    <label for="email">Email</label>
+                    <input id="email" name="email" type="email" autocomplete="username" required>
+                </div>
+                <div class="field">
+                    <label for="password">Password</label>
+                    <input id="password" name="password" type="password" autocomplete="current-password" required>
+                </div>
+                <button class="primary-button" id="signin-button" type="submit">Sign in</button>
+                <p class="message" id="signin-message" role="status" aria-live="polite"></p>
+            </form>
+            <p class="setup-note" id="setup-note" hidden>Connect Supabase, run <code>supabase/setup.sql</code>, deploy <code>supabase/functions/log-activity</code> with JWT verification disabled, and create the allowed administrator account.</p>
+        </section>
+
+        <section class="dashboard" id="dashboard" hidden aria-labelledby="dashboard-title">
+            <div class="dashboard-head">
+                <div>
+                    <p class="eyebrow">Recent activity</p>
+                    <h2 id="dashboard-title">Visitor log</h2>
+                </div>
+                <div class="dashboard-actions">
+                    <button class="quiet-button" id="refresh-button" type="button">Refresh</button>
+                    <button class="quiet-button" id="signout-button" type="button">Sign out</button>
+                </div>
+            </div>
+            <div class="stats" aria-label="Visitor summary">
+                <div class="stat"><span class="stat-label">Visits shown</span><strong class="stat-value" id="visit-count">0</strong></div>
+                <div class="stat"><span class="stat-label">Most recent</span><strong class="stat-value latest" id="latest-visit">No visits yet</strong></div>
+            </div>
+            <div class="visits-head">
+                <h3>Latest visits</h3>
+                <p>Showing up to 500 records</p>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th scope="col">Visit time</th><th scope="col">Device / browser</th><th scope="col">Device model</th><th scope="col">IP address</th></tr></thead>
+                    <tbody id="visit-rows"><tr><td class="empty" colspan="4">Loading visitor log…</td></tr></tbody>
+                </table>
+            </div>
+            <section class="attempts-section" aria-labelledby="attempts-title">
+                <div class="visits-head">
+                    <h3 id="attempts-title">Failed gallery password entries</h3>
+                    <p>Showing up to 500 records</p>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th scope="col">Attempt time</th><th scope="col">Device / browser</th><th scope="col">Device model</th><th scope="col">IP address</th></tr></thead>
+                        <tbody id="attempt-rows"><tr><td class="empty" colspan="4">Loading failed attempts…</td></tr></tbody>
+                    </table>
+                </div>
+            </section>
+            <section class="attempts-section" aria-labelledby="gallery-activity-title">
+                <div class="visits-head">
+                    <h3 id="gallery-activity-title">Consented gallery activity</h3>
+                    <p>Only visitors who chose “Allow tracking” are listed</p>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th scope="col">Time</th><th scope="col">Activity / answer</th><th scope="col">Device / browser</th><th scope="col">Device model</th><th scope="col">IP address</th></tr></thead>
+                        <tbody id="gallery-activity-rows"><tr><td class="empty" colspan="5">Loading gallery activity…</td></tr></tbody>
+                    </table>
+                </div>
+            </section>
+            <p class="message" id="dashboard-message" role="status" aria-live="polite"></p>
+            <p class="privacy">Gallery visit and Yes/No records include IP address, device/browser category, and model when available only for visitors who chose “Allow tracking.” Visitors who choose “Continue without tracking” are not listed here.</p>
+        </section>
+    </main>
+    <footer>Visitor records are private to the Supabase administrator account.</footer>
+    <script src="../visitor-config.js"></script>
+    <script>
+        const config = window.VISITOR_CONFIG || {};
+        const projectUrl = (config.supabaseUrl || "").replace(/\/+$/, "");
+        const publicKey = config.supabaseAnonKey || "";
+        const signin = document.getElementById("signin");
+        const dashboard = document.getElementById("dashboard");
+        const signinMessage = document.getElementById("signin-message");
+        const dashboardMessage = document.getElementById("dashboard-message");
+        const sessionKey = "visitor-admin-session";
+
+        function configured() {
+            return /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(projectUrl) && publicKey.length > 20;
+        }
+
+        function getSession() {
+            try {
+                return JSON.parse(sessionStorage.getItem(sessionKey) || "null");
+            } catch (_error) {
+                return null;
+            }
+        }
+
+        function saveSession(session) {
+            sessionStorage.setItem(sessionKey, JSON.stringify(session));
+        }
+
+        function clearSession() {
+            sessionStorage.removeItem(sessionKey);
+            dashboard.hidden = true;
+            signin.hidden = false;
+            document.getElementById("password").value = "";
+        }
+
+        async function readResponse(response) {
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                const message = data.msg || data.message || data.error_description || data.error || "Request failed.";
+                throw new Error(message);
+            }
+            return data;
+        }
+
+        async function refreshSession(session) {
+            if (!session.refresh_token) throw new Error("Your session expired. Please sign in again.");
+            const response = await fetch(`${projectUrl}/auth/v1/token?grant_type=refresh_token`, {
+                method: "POST",
+                headers: { apikey: publicKey, "Content-Type": "application/json" },
+                body: JSON.stringify({ refresh_token: session.refresh_token })
+            });
+            const refreshed = await readResponse(response);
+            saveSession(refreshed);
+            return refreshed;
+        }
+
+        async function fetchAdminRows(path) {
+            let session = getSession();
+            if (!session || !session.access_token) throw new Error("Please sign in to view the visitor log.");
+            let response = await fetch(projectUrl + path, {
+                headers: { apikey: publicKey, Authorization: `Bearer ${session.access_token}` }
+            });
+            if (response.status === 401) {
+                try {
+                    session = await refreshSession(session);
+                } catch (_error) {
+                    clearSession();
+                    throw new Error("Your session expired. Please sign in again.");
+                }
+                response = await fetch(projectUrl + path, {
+                    headers: { apikey: publicKey, Authorization: `Bearer ${session.access_token}` }
+                });
+            }
+            return readResponse(response);
+        }
+
+        function fetchVisits() {
+            return fetchAdminRows("/rest/v1/visits?select=id,visited_at,device,model,ip_address&order=visited_at.desc&limit=500");
+        }
+
+        function fetchGalleryAttempts() {
+            return fetchAdminRows("/rest/v1/gallery_password_attempts?select=id,attempted_at,device,model,ip_address&order=attempted_at.desc&limit=500");
+        }
+
+        function fetchGalleryActivity() {
+            return fetchAdminRows("/rest/v1/gallery_activity?select=id,recorded_at,activity,device,model,ip_address&order=recorded_at.desc&limit=500");
+        }
+
+        function formatTime(value) {
+            const date = new Date(value);
+            return Number.isNaN(date.getTime()) ? "Unknown time" : date.toLocaleString();
+        }
+
+        function renderVisits(visits) {
+            const rows = document.getElementById("visit-rows");
+            rows.replaceChildren();
+            document.getElementById("visit-count").textContent = String(visits.length);
+            document.getElementById("latest-visit").textContent = visits.length ? formatTime(visits[0].visited_at) : "No visits yet";
+            if (!visits.length) {
+                const row = document.createElement("tr");
+                const cell = document.createElement("td");
+                cell.className = "empty";
+                cell.colSpan = 4;
+                cell.textContent = "No visits have been recorded yet.";
+                row.append(cell);
+                rows.append(row);
+                return;
+            }
+            visits.forEach(visit => {
+                const row = document.createElement("tr");
+                const time = document.createElement("td");
+                const device = document.createElement("td");
+                const model = document.createElement("td");
+                const ipAddress = document.createElement("td");
+                time.textContent = formatTime(visit.visited_at);
+                device.textContent = visit.device || "Unknown device / browser";
+                model.textContent = visit.model || "Not available";
+                ipAddress.textContent = visit.ip_address || "Unavailable";
+                row.append(time, device, model, ipAddress);
+                rows.append(row);
+            });
+        }
+
+        function renderAttempts(attempts) {
+            const rows = document.getElementById("attempt-rows");
+            rows.replaceChildren();
+            if (!attempts.length) {
+                const row = document.createElement("tr");
+                const cell = document.createElement("td");
+                cell.className = "empty";
+                cell.colSpan = 4;
+                cell.textContent = "No failed gallery password attempts.";
+                row.append(cell);
+                rows.append(row);
+                return;
+            }
+            attempts.forEach(attempt => {
+                const row = document.createElement("tr");
+                const time = document.createElement("td");
+                const device = document.createElement("td");
+                const model = document.createElement("td");
+                const ipAddress = document.createElement("td");
+                time.textContent = formatTime(attempt.attempted_at);
+                device.textContent = attempt.device || "Unknown device / browser";
+                model.textContent = attempt.model || "Not available";
+                ipAddress.textContent = attempt.ip_address || "Unavailable";
+                row.append(time, device, model, ipAddress);
+                rows.append(row);
+            });
+        }
+
+        function renderGalleryActivity(activityRows) {
+            const rows = document.getElementById("gallery-activity-rows");
+            rows.replaceChildren();
+            if (!activityRows.length) {
+                const row = document.createElement("tr");
+                const cell = document.createElement("td");
+                cell.className = "empty";
+                cell.colSpan = 5;
+                cell.textContent = "No opted-in gallery activity has been recorded.";
+                row.append(cell);
+                rows.append(row);
+                return;
+            }
+            activityRows.forEach(activity => {
+                const row = document.createElement("tr");
+                const time = document.createElement("td");
+                const event = document.createElement("td");
+                const device = document.createElement("td");
+                const model = document.createElement("td");
+                const ipAddress = document.createElement("td");
+                time.textContent = formatTime(activity.recorded_at);
+                event.textContent = activity.activity === "gallery_entry"
+                    ? "Gallery visit"
+                    : activity.activity === "yes"
+                        ? "Yes"
+                        : "No";
+                device.textContent = activity.device || "Unknown device / browser";
+                model.textContent = activity.model || "Not available";
+                ipAddress.textContent = activity.ip_address || "Unavailable";
+                row.append(time, event, device, model, ipAddress);
+                rows.append(row);
+            });
+        }
+
+        async function loadVisits() {
+            dashboardMessage.textContent = "Loading visits…";
+            document.getElementById("refresh-button").disabled = true;
+            try {
+                const visits = await fetchVisits();
+                renderVisits(visits);
+                const attempts = await fetchGalleryAttempts();
+                renderAttempts(attempts);
+                const galleryActivity = await fetchGalleryActivity();
+                renderGalleryActivity(galleryActivity);
+                dashboardMessage.textContent = "Activity log is up to date.";
+            } catch (error) {
+                if (/sign in|session expired/i.test(error.message)) {
+                    clearSession();
+                    signinMessage.textContent = error.message;
+                }
+                dashboardMessage.textContent = error.message;
+            } finally {
+                document.getElementById("refresh-button").disabled = false;
+            }
+        }
+
+        document.getElementById("signin-form").addEventListener("submit", async event => {
+            event.preventDefault();
+            signinMessage.textContent = "";
+            if (!configured()) {
+                document.getElementById("setup-note").hidden = false;
+                return;
+            }
+            const button = document.getElementById("signin-button");
+            button.disabled = true;
+            button.textContent = "Signing in…";
+            try {
+                const response = await fetch(`${projectUrl}/auth/v1/token?grant_type=password`, {
+                    method: "POST",
+                    headers: { apikey: publicKey, "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        email: document.getElementById("email").value.trim(),
+                        password: document.getElementById("password").value
+                    })
+                });
+                saveSession(await readResponse(response));
+                signin.hidden = true;
+                dashboard.hidden = false;
+                await loadVisits();
+            } catch (_error) {
+                signinMessage.textContent = "Sign-in failed. Check the email and password, then try again.";
+            } finally {
+                button.disabled = false;
+                button.textContent = "Sign in";
+            }
+        });
+
+        document.getElementById("refresh-button").addEventListener("click", loadVisits);
+        document.getElementById("signout-button").addEventListener("click", () => {
+            clearSession();
+            signinMessage.textContent = "You have signed out.";
+        });
+
+        if (!configured()) document.getElementById("setup-note").hidden = false;
+        const savedSession = getSession();
+        if (configured() && savedSession && savedSession.access_token) {
+            signin.hidden = true;
+            dashboard.hidden = false;
+            loadVisits();
+        }
+    </script>
+</body>
+</html>

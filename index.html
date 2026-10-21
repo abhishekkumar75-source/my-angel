@@ -1,0 +1,893 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#fff5f7">
+    <title>A little love letter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@400;500;600&family=Great+Vibes&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            color-scheme: light;
+            --paper: #fff5f7;
+            --paper-deep: #fbe7ed;
+            --rose: #ff6b9d;
+            --rose-dark: #c9184a;
+            --plum: #4a1d2e;
+            --muted: #896b78;
+            --line: rgba(126, 56, 82, .14);
+            --serif: "Cormorant Garamond", Georgia, serif;
+            --sans: "DM Sans", sans-serif;
+            --ease: cubic-bezier(.2, .75, .25, 1);
+        }
+
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+        body {
+            margin: 0;
+            overflow-x: hidden;
+            background:
+                radial-gradient(ellipse at 6% 39%, rgba(255, 190, 207, .22), transparent 30rem),
+                radial-gradient(ellipse at 94% 72%, rgba(246, 194, 208, .2), transparent 28rem),
+                var(--paper);
+            color: var(--plum);
+            font-family: var(--sans);
+            font-size: 15px;
+            line-height: 1.65;
+        }
+        button { color: inherit; font: inherit; }
+        a { color: inherit; }
+        ::selection { color: white; background: var(--rose-dark); }
+
+        .topline {
+            position: absolute;
+            z-index: 3;
+            top: 0;
+            left: 0;
+            display: flex;
+            width: 100%;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 26px clamp(20px, 5vw, 72px);
+            color: white;
+            font-size: 10px;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+        }
+        .topline-mark { display: flex; align-items: center; gap: 10px; }
+        .topline-mark span { color: #ffc2d2; font-size: 16px; }
+        .hero {
+            position: relative;
+            display: flex;
+            min-height: 100svh;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+            text-align: center;
+            isolation: isolate;
+        }
+        .hero-visual {
+            position: absolute;
+            z-index: -1;
+            inset: 0 0 auto;
+            height: min(82svh, 900px);
+            overflow: hidden;
+            background: #776a6c;
+        }
+        .hero-visual::before, .hero-visual::after {
+            position: absolute;
+            z-index: 1;
+            content: "";
+            inset: 0;
+            pointer-events: none;
+        }
+        .hero-visual::before {
+            background: linear-gradient(115deg, rgba(201,24,74,.15), transparent 54%, rgba(255,107,157,.17));
+            mix-blend-mode: screen;
+        }
+        .hero-visual::after {
+            background: linear-gradient(180deg, rgba(54,20,37,.28) 0%, transparent 25%, rgba(74,29,46,.06) 54%, var(--paper) 100%);
+        }
+        .hero-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 45%;
+            filter: grayscale(1) contrast(1.02);
+            transform: scale(1.035);
+            translate: 0 var(--parallax, 0px);
+            animation: ken-burns 24s ease-in-out infinite alternate;
+            will-change: transform;
+        }
+        .hero-copy {
+            position: relative;
+            z-index: 2;
+            width: min(1200px, 100%);
+            margin: auto 24px 0;
+            padding: 0 0 22vh;
+            text-shadow: none;
+        }
+        .eyebrow {
+            margin: 0 0 16px;
+            color: var(--rose-dark);
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: .24em;
+            text-transform: uppercase;
+        }
+        .hero .eyebrow { color: var(--rose-dark); }
+        h1, h2, h3, p { margin-top: 0; }
+        h1, h2, h3 { font-family: var(--serif); font-weight: 500; }
+        h1 {
+            margin-bottom: 14px;
+            color: var(--plum);
+            font-size: clamp(3.1rem, 6.8vw, 6.5rem);
+            line-height: .9;
+        }
+        .letter-char {
+            display: inline-block;
+            opacity: 0;
+            animation: letter-in .8s var(--ease) forwards;
+            animation-delay: calc(var(--char-index) * 42ms + 450ms);
+        }
+        .hero-subtitle {
+            margin: 0;
+            color: rgba(74,29,46,.78);
+            font-family: var(--serif);
+            font-size: clamp(1.2rem, 2vw, 1.55rem);
+            font-style: italic;
+        }
+        .scroll-hint {
+            position: absolute;
+            z-index: 2;
+            bottom: 28px;
+            display: grid;
+            justify-items: center;
+            gap: 9px;
+            color: var(--rose-dark);
+            font-size: 9px;
+            letter-spacing: .16em;
+            text-decoration: none;
+            text-transform: uppercase;
+        }
+        .scroll-heart { display: block; font-size: 17px; animation: heart-bob 1.8s ease-in-out infinite; }
+
+        main { position: relative; z-index: 1; }
+        .section {
+            position: relative;
+            display: flex;
+            min-height: 76svh;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: clamp(84px, 12vw, 150px) 24px;
+            text-align: center;
+        }
+        .section-inner { width: min(960px, 100%); margin-inline: auto; }
+        .section-heading { max-width: 700px; margin: 0 auto 42px; }
+        .section-heading h2, .counter-heading {
+            margin-bottom: 12px;
+            font-size: clamp(2.7rem, 5.5vw, 4.6rem);
+            line-height: .98;
+        }
+        .section-heading p { margin: 0; color: var(--muted); }
+        .script-note { color: var(--rose-dark); font-family: "Great Vibes", cursive; font-size: 1.8rem; }
+        .reveal {
+            opacity: 0;
+            transform: translateY(26px);
+            transition: opacity .9s var(--ease), transform .9s var(--ease);
+        }
+        .reveal.is-visible { opacity: 1; transform: translateY(0); }
+
+        .counter-section { min-height: 62svh; }
+        .counter-frame {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,.9);
+            border-radius: 4px;
+            padding: clamp(30px, 6vw, 60px) clamp(20px, 5vw, 64px);
+            background: linear-gradient(135deg, rgba(255,255,255,.72), rgba(255,234,240,.55));
+            box-shadow: 0 24px 80px rgba(133,42,78,.08), inset 0 0 0 1px rgba(201,24,74,.04);
+            backdrop-filter: blur(18px);
+        }
+        .counter-frame::before {
+            position: absolute;
+            top: -90px;
+            right: -65px;
+            width: 220px;
+            height: 220px;
+            border: 1px solid rgba(201,24,74,.1);
+            border-radius: 50%;
+            content: "";
+        }
+        .counter-heading { margin-bottom: 8px; font-size: clamp(2.4rem, 5vw, 4rem); }
+        .counter-caption { margin: 0 0 32px; color: var(--muted); }
+        .timer {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: clamp(12px, 4vw, 42px);
+            max-width: 650px;
+            margin: auto;
+        }
+        .time-unit { display: grid; gap: 3px; }
+        .time-value { font-family: var(--serif); font-size: clamp(2.1rem, 6vw, 4.2rem); line-height: 1; font-variant-numeric: tabular-nums; }
+        .time-label { color: var(--muted); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; }
+
+        .letter-section { min-height: 80svh; }
+        .envelope-button {
+            display: grid;
+            justify-items: center;
+            gap: 18px;
+            border: 0;
+            padding: 14px;
+            background: transparent;
+            cursor: pointer;
+        }
+        .envelope-button:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid var(--rose-dark); outline-offset: 5px; }
+        .envelope {
+            position: relative;
+            width: 148px;
+            height: 98px;
+            border-radius: 3px;
+            background: #d63d68;
+            box-shadow: 0 18px 30px rgba(135,39,72,.17);
+            transition: transform .5s var(--ease);
+            perspective: 500px;
+        }
+        .envelope-button:hover .envelope { transform: translateY(-5px); }
+        .envelope::before, .envelope::after { position: absolute; inset: 0; content: ""; }
+        .envelope::before { background: #f0809f; clip-path: polygon(0 0, 50% 56%, 100% 0); transform-origin: top; transition: transform .65s var(--ease), z-index .01s .3s; z-index: 2; }
+        .envelope::after { background: linear-gradient(145deg, #f5a1b7, #d94d75); clip-path: polygon(0 100%, 50% 42%, 100% 100%); z-index: 1; }
+        .envelope-seal {
+            position: absolute;
+            z-index: 3;
+            top: 43px;
+            left: 63px;
+            display: grid;
+            width: 22px;
+            height: 22px;
+            place-items: center;
+            border-radius: 50%;
+            background: #fff1f4;
+            color: var(--rose-dark);
+            font-size: 11px;
+            transition: opacity .3s ease;
+        }
+        .envelope.open::before { z-index: 0; transform: rotateX(180deg); }
+        .envelope.open .envelope-seal { opacity: 0; }
+        .envelope-label { color: var(--muted); font-size: 11px; letter-spacing: .15em; text-transform: uppercase; }
+        .love-letter {
+            width: min(640px, 100%);
+            min-height: 0;
+            margin: 0 auto;
+            padding: 0 0 8px;
+            opacity: 0;
+            transition: opacity .8s ease, margin .6s var(--ease);
+        }
+        .love-letter.is-open { margin-top: 34px; opacity: 1; }
+        .letter-paper {
+            border: 1px solid rgba(201,24,74,.11);
+            padding: clamp(24px, 6vw, 48px);
+            background: rgba(255,255,255,.62);
+            box-shadow: 0 18px 45px rgba(133,42,78,.07);
+            text-align: left;
+        }
+        .letter-paper p { min-height: 8em; margin: 0; color: #634453; font-family: var(--serif); font-size: clamp(1.25rem, 2.6vw, 1.65rem); line-height: 1.7; }
+        .letter-signoff { display: block; margin-top: 18px; color: var(--rose-dark); font-family: "Great Vibes", cursive; font-size: 1.7rem; text-align: right; }
+
+        .reasons-section { min-height: 95svh; }
+        .reasons-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; text-align: left; }
+        .reason-card {
+            min-height: 180px;
+            border: 1px solid rgba(255,255,255,.9);
+            border-radius: 3px;
+            padding: 25px 24px;
+            background: linear-gradient(145deg, rgba(255,255,255,.78), rgba(255,236,242,.52));
+            box-shadow: 0 12px 32px rgba(133,42,78,.055);
+            backdrop-filter: blur(12px);
+            transition: transform .45s var(--ease), box-shadow .45s ease;
+        }
+        .reason-card:hover { transform: translateY(-5px); box-shadow: 0 19px 40px rgba(133,42,78,.1); }
+        .reason-number { display: block; margin-bottom: 20px; color: var(--rose-dark); font-family: var(--serif); font-size: 1.25rem; }
+        .reason-card p { margin: 0; font-family: var(--serif); font-size: 1.45rem; line-height: 1.25; }
+        .reason-card:nth-child(2), .reason-card:nth-child(5) { transition-delay: 90ms; }
+        .reason-card:nth-child(3), .reason-card:nth-child(6) { transition-delay: 180ms; }
+
+        .story-section { min-height: 88svh; }
+        .timeline { position: relative; display: grid; gap: 0; width: min(720px, 100%); margin: auto; text-align: left; }
+        .timeline::before { position: absolute; top: 17px; bottom: 17px; left: 9px; width: 1px; background: linear-gradient(var(--rose), rgba(201,24,74,.12)); content: ""; }
+        .milestone { position: relative; display: grid; grid-template-columns: 20px 1fr; gap: 22px; padding: 0 0 34px; }
+        .milestone:last-child { padding-bottom: 0; }
+        .timeline-dot { z-index: 1; width: 19px; height: 19px; margin-top: 4px; border: 1px solid var(--rose-dark); border-radius: 50%; background: var(--paper); box-shadow: inset 0 0 0 5px var(--paper); }
+        .milestone-date { margin: 0 0 3px; color: var(--rose-dark); font-size: 9px; letter-spacing: .17em; text-transform: uppercase; }
+        .milestone h3 { margin: 0 0 3px; font-size: 1.8rem; line-height: 1.1; }
+        .milestone p:last-child { margin: 0; color: var(--muted); font-size: 13px; }
+
+        .surprise-section { min-height: 58svh; }
+        .archive-section { min-height: 62svh; }
+        .gallery-section { min-height: 62svh; }
+        .archive-link { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; border: 1px solid var(--rose-dark); border-radius: 999px; padding: 0 27px; background: var(--rose-dark); color: white; text-decoration: none; box-shadow: 0 9px 25px rgba(201,24,74,.17); transition: transform .25s ease, background .25s ease, box-shadow .25s ease; }
+        .archive-link:hover { transform: translateY(-2px); background: #ad123f; box-shadow: 0 13px 30px rgba(201,24,74,.25); }
+        .surprise-button, .yes-button {
+            min-height: 52px;
+            border: 1px solid var(--rose-dark);
+            border-radius: 999px;
+            padding: 0 27px;
+            background: var(--rose-dark);
+            color: white;
+            cursor: pointer;
+            transition: transform .25s ease, background .25s ease, box-shadow .25s ease;
+            box-shadow: 0 9px 25px rgba(201,24,74,.17);
+        }
+        .surprise-button:hover, .yes-button:hover { transform: translateY(-2px); background: #ad123f; box-shadow: 0 13px 30px rgba(201,24,74,.25); }
+        .surprise-message { min-height: 34px; margin: 20px 0 0; color: var(--rose-dark); font-family: var(--serif); font-size: 1.5rem; }
+
+        .finale {
+            position: relative;
+            display: flex;
+            min-height: 100svh;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 100px 24px;
+            background:
+                radial-gradient(ellipse at 50% 110%, rgba(239,155,180,.42), transparent 48%),
+                linear-gradient(155deg, #fff0f4, #fce4eb 58%, #fff5f7);
+            text-align: center;
+        }
+        .finale::before, .finale::after { position: absolute; width: 50vw; height: 50vw; border: 1px solid rgba(201,24,74,.08); border-radius: 50%; content: ""; pointer-events: none; }
+        .finale::before { top: -28vw; left: -18vw; }
+        .finale::after { right: -20vw; bottom: -34vw; }
+        .finale-inner { position: relative; z-index: 1; width: min(760px, 100%); }
+        .finale h2 { margin: 0 auto 12px; font-size: clamp(3.1rem, 8vw, 6.5rem); line-height: .94; }
+        .finale-copy { margin: 0 auto 34px; color: var(--muted); }
+        .finale-actions { position: relative; display: flex; width: min(540px, 100%); min-height: 210px; align-items: center; justify-content: center; gap: 28px; margin-inline: auto; }
+        .yes-button { position: relative; z-index: 2; transform: scale(var(--yes-scale, 1)); }
+        .yes-button:hover { transform: scale(var(--yes-scale, 1)) translateY(-2px); }
+        .no-button {
+            position: relative;
+            z-index: 1;
+            min-height: 48px;
+            border: 1px solid rgba(74,29,46,.2);
+            border-radius: 999px;
+            padding: 0 24px;
+            background: rgba(255,255,255,.55);
+            cursor: pointer;
+            transition: left .2s ease, top .2s ease, transform .2s ease;
+        }
+        .finale-actions.is-playing .no-button { position: absolute; }
+        .finale-actions.is-playing .yes-button { position: absolute; }
+        .answer { min-height: 72px; margin: 30px 0 0; color: var(--rose-dark); font-family: var(--serif); font-size: clamp(2rem, 5vw, 3.7rem); line-height: 1.05; }
+        .footer { padding: 25px 20px 30px; color: var(--muted); font-size: 10px; letter-spacing: .12em; text-align: center; text-transform: uppercase; }
+        .footer > span:not(.footer-note) { color: var(--rose-dark); }
+        .footer-note { display: block; margin-top: 8px; font-size: 9px; letter-spacing: .04em; text-transform: none; }
+
+        #particles, #effects, #cursor, #cursor-dot { position: fixed; inset: 0; pointer-events: none; }
+        #particles { z-index: 0; overflow: hidden; }
+        #effects { z-index: 20; width: 100%; height: 100%; }
+        .particle {
+            position: absolute;
+            bottom: -30px;
+            color: rgba(201,24,74,.2);
+            font-size: var(--size, 12px);
+            animation: drift var(--duration, 18s) linear forwards;
+            will-change: transform, opacity;
+        }
+        .sparkle { color: rgba(255,107,157,.48); }
+        #cursor { z-index: 50; inset: auto auto 0 0; display: none; width: 26px; height: 26px; border: 1px solid rgba(201,24,74,.72); border-radius: 50%; transform: translate(-50%, -50%); transition: width .2s ease, height .2s ease; }
+        #cursor-dot { z-index: 50; inset: auto auto 0 0; display: none; width: 4px; height: 4px; border-radius: 50%; background: var(--rose-dark); transform: translate(-50%, -50%); }
+        body.has-cursor, body.has-cursor * { cursor: none; }
+        body.has-cursor #cursor, body.has-cursor #cursor-dot { display: block; }
+        body.has-cursor:has(button:hover) #cursor { width: 36px; height: 36px; }
+        .trail-heart { position: fixed; z-index: 49; pointer-events: none; color: var(--rose); animation: trail-fade .8s ease-out forwards; }
+        .celebration { position: fixed; z-index: 19; display: grid; place-items: center; pointer-events: none; animation: pop-heart 1.5s var(--ease) forwards; }
+        .celebration span { color: var(--rose-dark); font-size: var(--burst-size, 28px); filter: drop-shadow(0 4px 12px rgba(201,24,74,.2)); }
+
+        @keyframes ken-burns { from { transform: scale(1.035) translate3d(0,0,0); } to { transform: scale(1.12) translate3d(0,-1.2%,0); } }
+        @keyframes letter-in { to { opacity: 1; transform: translateY(0); } }
+        @keyframes heart-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+        @keyframes drift { 0% { transform: translate3d(0,0,0) rotate(0); opacity: 0; } 12% { opacity: .7; } 84% { opacity: .55; } 100% { transform: translate3d(var(--sway, 40px), -110vh, 0) rotate(30deg); opacity: 0; } }
+        @keyframes trail-fade { to { transform: translateY(-22px) scale(.45) rotate(22deg); opacity: 0; } }
+        @keyframes pop-heart { 0% { transform: translate(-50%,-50%) scale(.3); opacity: 0; } 18% { opacity: 1; } 100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.1) rotate(var(--rotate)); opacity: 0; } }
+
+        @media (max-width: 700px) {
+            .topline { padding: 16px 18px; font-size: 8px; }
+            .hero { min-height: 100svh; }
+            .hero-visual { height: 58vw; max-height: 340px; background: #eee; }
+            .hero-image { object-fit: contain; object-position: center top; animation-duration: 30s; }
+            .hero-visual::after { background: linear-gradient(180deg, rgba(74,29,46,.13), transparent 30%, rgba(74,29,46,.02) 54%, var(--paper) 100%); }
+            .hero-copy { margin: 0 18px auto; padding: calc(58vw - 1.1rem) 0 0; }
+            .hero .eyebrow { margin-bottom: 12px; color: var(--rose-dark); text-shadow: none; }
+            .hero h1 { color: var(--plum); font-size: clamp(3rem, 13vw, 5rem); text-shadow: none; }
+            .hero-subtitle { max-width: 330px; margin: auto; color: var(--muted); text-shadow: none; }
+            .scroll-hint { bottom: 22px; }
+            .section { min-height: auto; padding: 96px 20px; }
+            .counter-section { min-height: 70svh; }
+            .timer { gap: 8px; }
+            .time-label { font-size: 8px; letter-spacing: .1em; }
+            .reasons-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+            .reason-card { min-height: 162px; padding: 18px 16px; }
+            .reason-card p { font-size: 1.26rem; }
+            .reason-number { margin-bottom: 17px; }
+            .story-section { min-height: auto; }
+            .finale { min-height: 100svh; }
+            .footer { padding-bottom: 24px; }
+        }
+        @media (max-width: 360px) {
+            .topline { letter-spacing: .1em; }
+            .hero-copy { padding-top: calc(58vw - .4rem); }
+            .time-value { font-size: 1.85rem; }
+            .reason-card { min-height: 174px; }
+            .reason-card p { font-size: 1.15rem; }
+        }
+        @media (hover: none), (pointer: coarse) { #cursor, #cursor-dot { display: none !important; } }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+            .reveal { opacity: 1; transform: none; }
+        }
+    </style>
+</head>
+<body>
+    <div id="particles" aria-hidden="true"></div>
+    <div id="cursor" aria-hidden="true"></div>
+    <div id="cursor-dot" aria-hidden="true"></div>
+    <canvas id="effects" aria-hidden="true"></canvas>
+
+    <header class="hero" id="top">
+        <div class="hero-visual" id="hero-visual">
+            <img class="hero-image" src="eyes.jpeg" alt="A close-up of her eyes" fetchpriority="high">
+        </div>
+        <div class="topline">
+            <div class="topline-mark"><span aria-hidden="true">♡</span> A little love letter</div>
+        </div>
+        <div class="hero-copy">
+            <p class="eyebrow" id="hero-eyebrow">For someone unforgettable</p>
+            <h1 id="hero-title" aria-label="I got lost in your eyes"></h1>
+            <p class="hero-subtitle">and never wanted to be found.</p>
+        </div>
+        <a class="scroll-hint" href="#our-time"><span class="scroll-heart" aria-hidden="true">♡</span>Scroll gently</a>
+    </header>
+
+    <main>
+        <section class="section counter-section" id="our-time">
+            <div class="section-inner counter-frame reveal">
+                <p class="eyebrow">Every second, a little more</p>
+                <h2 class="counter-heading">Our time, so far</h2>
+                <p class="counter-caption">And still my favorite story.</p>
+                <div class="timer" id="timer" aria-label="Time since we met">
+                    <div class="time-unit"><span class="time-value" id="days">0</span><span class="time-label">Days</span></div>
+                    <div class="time-unit"><span class="time-value" id="hours">00</span><span class="time-label">Hours</span></div>
+                    <div class="time-unit"><span class="time-value" id="minutes">00</span><span class="time-label">Minutes</span></div>
+                    <div class="time-unit"><span class="time-value" id="seconds">00</span><span class="time-label">Seconds</span></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section letter-section" id="letter">
+            <div class="section-inner reveal">
+                <div class="section-heading">
+                    <p class="eyebrow">Something I wanted you to know</p>
+                    <h2>A note, just for you</h2>
+                    <p>There are a few things I never want you to forget.</p>
+                </div>
+                <button class="envelope-button" id="envelope-button" type="button" aria-expanded="false" aria-controls="love-letter">
+                    <span class="envelope" id="envelope" aria-hidden="true"><span class="envelope-seal">♥</span></span>
+                    <span class="envelope-label" id="envelope-label">Tap to open</span>
+                </button>
+                <div class="love-letter" id="love-letter" aria-live="polite" aria-hidden="true">
+                    <div class="letter-paper">
+                        <p id="letter-text"></p>
+                        <span class="letter-signoff" id="letter-signoff"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section reasons-section" id="reasons">
+            <div class="section-inner">
+                <div class="section-heading reveal">
+                    <p class="eyebrow">I could keep going</p>
+                    <h2>Little things. <span class="script-note">Endless reasons.</span></h2>
+                    <p>Six of the million ways you make my world better.</p>
+                </div>
+                <div class="reasons-grid" id="reasons-grid"></div>
+            </div>
+        </section>
+
+        <section class="section story-section" id="story">
+            <div class="section-inner">
+                <div class="section-heading reveal">
+                    <p class="eyebrow">A few favorite chapters</p>
+                    <h2>Our little story</h2>
+                    <p>My favorite part is that we get to keep writing it.</p>
+                </div>
+                <div class="timeline" id="timeline"></div>
+            </div>
+        </section>
+
+        <section class="section archive-section" id="100k-love">
+            <div class="section-inner reveal">
+                <p class="eyebrow">A hundred thousand little reminders</p>
+                <div class="section-heading">
+                    <h2>100K I love you's, handwritten for you. Without AI.</h2>
+                    <p>One message at a time, every line is here for you.</p>
+                </div>
+                <a class="archive-link" href="100k-love/">Read all 100,000 messages</a>
+            </div>
+        </section>
+
+        <section class="section gallery-section" id="gallery">
+            <div class="section-inner reveal">
+                <p class="eyebrow">A few favorite chapters</p>
+                <div class="section-heading">
+                    <h2>Our memories</h2>
+                    <p>A little place for all the moments I want to keep close.</p>
+                </div>
+                <a class="archive-link" href="gallery/index.html">Open our photo gallery</a>
+            </div>
+        </section>
+
+        <section class="section surprise-section" id="surprise">
+            <div class="section-inner reveal">
+                <p class="eyebrow">A tiny interruption</p>
+                <div class="section-heading">
+                    <h2>One more little thing</h2>
+                    <p>Because you deserve a surprise on an ordinary day, too.</p>
+                </div>
+                <button class="surprise-button" id="surprise-button" type="button">Tap for a surprise <span aria-hidden="true">♡</span></button>
+                <p class="surprise-message" id="surprise-message" aria-live="polite"></p>
+            </div>
+        </section>
+
+        <section class="finale" id="finale">
+            <div class="finale-inner reveal">
+                <p class="eyebrow">And one last question...</p>
+                <h2 id="final-question">Will you stay with me forever?</h2>
+                <p class="finale-copy">No pressure, just a very hopeful heart.</p>
+                <div class="finale-actions" id="finale-actions">
+                    <button class="yes-button" id="yes-button" type="button">Yes, always</button>
+                    <button class="no-button" id="no-button" type="button">No</button>
+                </div>
+                <p class="answer" id="answer" aria-live="polite"></p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        Made with love by <span id="footer-name">Someone who adores you</span>
+        <span class="footer-note">The visitor log records visit time, IP address, device/browser category, and model when available. Failed gallery password attempts are logged with the same details.</span>
+        <a class="footer-note" href="admin/index.html">Private admin sign in</a>
+    </footer>
+    <script src="visitor-config.js"></script>
+    <script src="device-info.js"></script>
+    <script>
+        // Personalize this object: her name, your name, date, and words.
+        const CONFIG = {
+            herName: "Prema",
+            yourName: "Someone who adores you",
+            metDate: "2024-02-14T00:00:00",
+            heroLine: "I got lost in your eyes",
+            heroSubline: "and never wanted to be found.",
+            letter: [
+                "I know, I was a coward who made mistakes and hurt, I'm not here to prove I am right, But i am here to prove that I love you.",
+                "You are my everything, my reason and purpose of life, there is no one who could ever replace you, I want you,",
+                "I'm so sorry, I shouldn't have mistreated you, But I promise, I will never hurt you and I'll treat you like a princess"
+            ],
+            reasons: [
+                "Your brown, beautiful eyes, which made me its captive.",
+                "Your laugh, which I am so obbessed with",
+                "How adorable you are, you the core reason of beauty",
+                "The little gossips you make,",
+                "The way you treat me like a king",
+                "Simply, in all ways you are beautiful"
+            ],
+            milestones: [
+                { date: "The beginning", title: "The day we texted", note: "A little 'hey' that changed everything." },
+                { date: "A favorite first", title: "Our first date", note: "The start of so many favorite memories." },
+                { date: "Out in the world", title: "Our first kiss", note: "The moment when I felt heaven." },
+                { date: "Right here, right now", title: "Still choosing you", note: "And looking forward to all that's next." }
+            ],
+            proposal: "Will you stay with me forever?",
+            surprises: [
+                "In case you forgot today: you are my favorite person.",
+                "A little reminder: your smile makes ordinary days feel golden.",
+                "If I could choose again, I would still choose you.",
+                "Somehow, the world feels softer whenever you are near."
+            ]
+        };
+
+        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const herName = CONFIG.herName.trim() || "My love";
+        document.title = `A little love letter for ${herName}`;
+        document.getElementById("hero-eyebrow").textContent = `For ${herName}`;
+        document.getElementById("hero-title").setAttribute("aria-label", CONFIG.heroLine);
+        document.querySelector(".hero-subtitle").textContent = CONFIG.heroSubline;
+        document.getElementById("final-question").textContent = CONFIG.proposal;
+        document.getElementById("footer-name").textContent = CONFIG.yourName;
+        document.getElementById("letter-signoff").textContent = `All my love, ${CONFIG.yourName}`;
+
+        const heroTitle = document.getElementById("hero-title");
+        [...CONFIG.heroLine].forEach((character, index) => {
+            if (character === " ") {
+                heroTitle.append(document.createTextNode(" "));
+                return;
+            }
+            const span = document.createElement("span");
+            span.className = "letter-char";
+            span.style.setProperty("--char-index", index);
+            span.textContent = character;
+            heroTitle.append(span);
+        });
+
+        const reasonsGrid = document.getElementById("reasons-grid");
+        CONFIG.reasons.slice(0, 6).forEach((reason, index) => {
+            const card = document.createElement("article");
+            card.className = "reason-card reveal";
+            const number = document.createElement("span");
+            number.className = "reason-number";
+            number.textContent = String(index + 1).padStart(2, "0");
+            const text = document.createElement("p");
+            text.textContent = reason;
+            card.append(number, text);
+            reasonsGrid.append(card);
+        });
+
+        const timeline = document.getElementById("timeline");
+        CONFIG.milestones.slice(0, 4).forEach((milestone, index) => {
+            const item = document.createElement("article");
+            item.className = "milestone reveal";
+            item.style.transitionDelay = `${index * 100}ms`;
+            item.innerHTML = "<span class=\"timeline-dot\" aria-hidden=\"true\"></span><div><p class=\"milestone-date\"></p><h3></h3><p></p></div>";
+            item.querySelector(".milestone-date").textContent = milestone.date;
+            item.querySelector("h3").textContent = milestone.title;
+            item.querySelector("div p:last-child").textContent = milestone.note;
+            timeline.append(item);
+        });
+
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("is-visible");
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.14 });
+        document.querySelectorAll(".reveal").forEach(element => revealObserver.observe(element));
+
+        const startTime = new Date(CONFIG.metDate).getTime();
+        const pad = value => String(value).padStart(2, "0");
+        function updateTimer() {
+            const elapsed = Math.max(0, Date.now() - startTime);
+            const totalSeconds = Math.floor(elapsed / 1000);
+            const days = Math.floor(totalSeconds / 86400);
+            document.getElementById("days").textContent = days.toLocaleString();
+            document.getElementById("hours").textContent = pad(Math.floor(totalSeconds / 3600) % 24);
+            document.getElementById("minutes").textContent = pad(Math.floor(totalSeconds / 60) % 60);
+            document.getElementById("seconds").textContent = pad(totalSeconds % 60);
+        }
+        updateTimer();
+        window.setInterval(updateTimer, 1000);
+
+        const envelopeButton = document.getElementById("envelope-button");
+        const envelope = document.getElementById("envelope");
+        const letterPanel = document.getElementById("love-letter");
+        const letterText = document.getElementById("letter-text");
+        let letterStarted = false;
+        envelopeButton.addEventListener("click", () => {
+            const isOpen = envelope.classList.toggle("open");
+            envelopeButton.setAttribute("aria-expanded", String(isOpen));
+            envelopeButton.querySelector(".envelope-label").textContent = isOpen ? "A little something for you" : "Tap to open";
+            letterPanel.classList.toggle("is-open", isOpen);
+            letterPanel.setAttribute("aria-hidden", String(!isOpen));
+            if (isOpen && !letterStarted) {
+                letterStarted = true;
+                const fullLetter = CONFIG.letter.join("\n\n");
+                if (reducedMotion) {
+                    letterText.textContent = fullLetter;
+                    return;
+                }
+                let character = 0;
+                const typeNext = () => {
+                    letterText.textContent = fullLetter.slice(0, character++);
+                    if (character <= fullLetter.length) window.setTimeout(typeNext, 22);
+                };
+                typeNext();
+            }
+        });
+
+        const particles = document.getElementById("particles");
+        function addParticle() {
+            if (reducedMotion || document.hidden || particles.childElementCount > 24) return;
+            const particle = document.createElement("span");
+            const sparkle = Math.random() > .72;
+            particle.className = `particle${sparkle ? " sparkle" : ""}`;
+            particle.setAttribute("aria-hidden", "true");
+            particle.textContent = sparkle ? "✧" : (Math.random() > .5 ? "♡" : "·");
+            particle.style.left = `${Math.random() * 100}%`;
+            particle.style.setProperty("--size", `${sparkle ? 10 : 12 + Math.random() * 10}px`);
+            particle.style.setProperty("--duration", `${14 + Math.random() * 13}s`);
+            particle.style.setProperty("--sway", `${-50 + Math.random() * 100}px`);
+            particles.append(particle);
+            particle.addEventListener("animationend", () => particle.remove(), { once: true });
+        }
+        if (!reducedMotion) {
+            for (let i = 0; i < 12; i++) window.setTimeout(addParticle, i * 700);
+            window.setInterval(addParticle, 1300);
+        }
+
+        const cursor = document.getElementById("cursor");
+        const cursorDot = document.getElementById("cursor-dot");
+        const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
+        if (finePointer.matches) document.body.classList.add("has-cursor");
+        window.addEventListener("pointermove", event => {
+            cursor.style.left = `${event.clientX}px`;
+            cursor.style.top = `${event.clientY}px`;
+            cursorDot.style.left = `${event.clientX}px`;
+            cursorDot.style.top = `${event.clientY}px`;
+            if (!reducedMotion && Math.random() > .91) {
+                const heart = document.createElement("span");
+                heart.className = "trail-heart";
+                heart.textContent = "♥";
+                heart.style.left = `${event.clientX}px`;
+                heart.style.top = `${event.clientY}px`;
+                heart.style.fontSize = `${9 + Math.random() * 8}px`;
+                document.body.append(heart);
+                heart.addEventListener("animationend", () => heart.remove(), { once: true });
+            }
+        }, { passive: true });
+
+        const heroImage = document.querySelector(".hero-image");
+        let parallaxFrame = 0;
+        window.addEventListener("scroll", () => {
+            if (reducedMotion || parallaxFrame) return;
+            parallaxFrame = requestAnimationFrame(() => {
+                heroImage.style.setProperty("--parallax", `${Math.min(window.scrollY * .1, 80)}px`);
+                parallaxFrame = 0;
+            });
+        }, { passive: true });
+
+        const canvas = document.getElementById("effects");
+        const ctx = canvas.getContext("2d");
+        let confetti = [];
+        function resizeCanvas() {
+            const ratio = Math.min(window.devicePixelRatio || 1, 2);
+            canvas.width = window.innerWidth * ratio;
+            canvas.height = window.innerHeight * ratio;
+            canvas.style.width = `${window.innerWidth}px`;
+            canvas.style.height = `${window.innerHeight}px`;
+            ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+        }
+        resizeCanvas();
+        window.addEventListener("resize", resizeCanvas, { passive: true });
+        function burst(x = window.innerWidth / 2, y = window.innerHeight / 2, amount = 90) {
+            if (reducedMotion) {
+                heartBurst(x, y, 10);
+                return;
+            }
+            const colors = ["#c9184a", "#ff6b9d", "#f5a2bb", "#fff5f7", "#e9a83a"];
+            for (let i = 0; i < amount; i++) confetti.push({
+                x, y, vx: (Math.random() - .5) * 9, vy: -2 - Math.random() * 8,
+                gravity: .13 + Math.random() * .1, size: 3 + Math.random() * 5,
+                rotation: Math.random() * 6, spin: (Math.random() - .5) * .18,
+                color: colors[Math.floor(Math.random() * colors.length)], life: 100 + Math.random() * 55
+            });
+            if (!burst.running) { burst.running = true; requestAnimationFrame(drawConfetti); }
+        }
+        function drawConfetti() {
+            ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+            confetti = confetti.filter(piece => piece.life > 0 && piece.y < window.innerHeight + 20);
+            confetti.forEach(piece => {
+                piece.x += piece.vx;
+                piece.y += piece.vy;
+                piece.vy += piece.gravity;
+                piece.rotation += piece.spin;
+                piece.life--;
+                ctx.save();
+                ctx.translate(piece.x, piece.y);
+                ctx.rotate(piece.rotation);
+                ctx.fillStyle = piece.color;
+                ctx.globalAlpha = Math.min(1, piece.life / 24);
+                ctx.fillRect(-piece.size / 2, -piece.size / 2, piece.size, piece.size * .7);
+                ctx.restore();
+            });
+            if (confetti.length) requestAnimationFrame(drawConfetti);
+            else { burst.running = false; ctx.clearRect(0, 0, window.innerWidth, window.innerHeight); }
+        }
+        function heartBurst(x, y, amount = 16) {
+            const symbols = ["♥", "♡", "✦"];
+            for (let i = 0; i < amount; i++) {
+                const angle = Math.PI * 2 * i / amount;
+                const distance = 80 + Math.random() * 180;
+                const heart = document.createElement("span");
+                heart.className = "celebration";
+                heart.style.left = `${x}px`;
+                heart.style.top = `${y}px`;
+                heart.style.setProperty("--dx", `${Math.cos(angle) * distance}px`);
+                heart.style.setProperty("--dy", `${Math.sin(angle) * distance}px`);
+                heart.style.setProperty("--rotate", `${-35 + Math.random() * 70}deg`);
+                heart.style.setProperty("--burst-size", `${16 + Math.random() * 24}px`);
+                const symbol = document.createElement("span");
+                symbol.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+                heart.append(symbol);
+                document.body.append(heart);
+                heart.addEventListener("animationend", () => heart.remove(), { once: true });
+            }
+        }
+
+        let lastSurprise = -1;
+        document.getElementById("surprise-button").addEventListener("click", event => {
+            const message = document.getElementById("surprise-message");
+            let surpriseIndex = Math.floor(Math.random() * CONFIG.surprises.length);
+            if (CONFIG.surprises.length > 1 && surpriseIndex === lastSurprise) surpriseIndex = (surpriseIndex + 1) % CONFIG.surprises.length;
+            lastSurprise = surpriseIndex;
+            message.textContent = CONFIG.surprises[surpriseIndex];
+            const rect = event.currentTarget.getBoundingClientRect();
+            burst(rect.left + rect.width / 2, rect.top + rect.height / 2, 70);
+            heartBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, 12);
+        });
+
+        const tracker = window.VISITOR_CONFIG || {};
+        const trackerUrl = (tracker.supabaseUrl || "").replace(/\/+$/, "");
+        const trackerKey = tracker.supabaseAnonKey || "";
+        const trackingReady = /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(trackerUrl) && trackerKey.length > 20;
+        let alreadyTracked = false;
+        try { alreadyTracked = sessionStorage.getItem("visitor-recorded") === "yes"; } catch (_error) {}
+        if (!alreadyTracked && trackingReady) {
+            window.getDeviceInfo().then(deviceInfo => fetch(`${trackerUrl}/functions/v1/log-activity`, {
+                method: "POST",
+                headers: {
+                    apikey: trackerKey,
+                    Authorization: `Bearer ${trackerKey}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ type: "visit", ...deviceInfo }),
+                keepalive: true
+            })).then(response => {
+                if (response.ok) {
+                    try { sessionStorage.setItem("visitor-recorded", "yes"); } catch (_error) {}
+                }
+            }).catch(() => {});
+        }
+
+        const actions = document.getElementById("finale-actions");
+        const noButton = document.getElementById("no-button");
+        const yesButton = document.getElementById("yes-button");
+        let yesScale = 1;
+        let yesOrigin;
+        function dodgeNo(event) {
+            if (!yesOrigin) {
+                yesOrigin = { left: yesButton.offsetLeft, top: yesButton.offsetTop };
+                actions.classList.add("is-playing");
+                yesButton.style.left = `${yesOrigin.left}px`;
+                yesButton.style.top = `${yesOrigin.top}px`;
+            }
+            yesScale = Math.min(1.2, yesScale + .08);
+            yesButton.style.setProperty("--yes-scale", yesScale);
+            const bounds = actions.getBoundingClientRect();
+            const button = noButton.getBoundingClientRect();
+            const maxLeft = Math.max(0, bounds.width - button.width);
+            const maxTop = Math.max(0, bounds.height - button.height);
+            const pointer = event ? { x: event.clientX - bounds.left, y: event.clientY - bounds.top } : null;
+            const left = pointer && pointer.x < bounds.width / 2 ? maxLeft : 0;
+            const top = pointer && pointer.y < bounds.height / 2 ? maxTop : 0;
+            noButton.style.left = `${left}px`;
+            noButton.style.top = `${top}px`;
+        }
+        noButton.addEventListener("pointerenter", dodgeNo);
+        noButton.addEventListener("pointerdown", event => { event.preventDefault(); dodgeNo(); });
+        noButton.addEventListener("click", dodgeNo);
+        yesButton.addEventListener("click", event => {
+            const answer = document.getElementById("answer");
+            answer.textContent = `I love you, ${herName}. Always.`;
+            const rect = event.currentTarget.getBoundingClientRect();
+            heartBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, 26);
+            burst(rect.left + rect.width / 2, rect.top + rect.height / 2, 150);
+            document.getElementById("final-question").textContent = "You just made me the happiest.";
+            document.querySelector(".finale-copy").textContent = "Here's to every little forever, together.";
+        });
+
+    </script>
+</body>
+</html>

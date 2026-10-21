@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#fff5f7">
+    <meta name="description" content="One hundred thousand little love notes, written for you.">
+    <title>100,000 little love notes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            color-scheme: light;
+            --paper: #fff5f7;
+            --paper-deep: #fbe7ed;
+            --rose: #ff6b9d;
+            --rose-dark: #c9184a;
+            --plum: #4a1d2e;
+            --muted: #896b78;
+            --line: rgba(126,56,82,.14);
+            --serif: "Cormorant Garamond", Georgia, serif;
+            --sans: "DM Sans", sans-serif;
+            --row-height: 82px;
+        }
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; scroll-padding-top: 20px; }
+        body {
+            min-width: 320px;
+            margin: 0;
+            overflow-x: hidden;
+            background:
+                radial-gradient(ellipse at 6% 34%, rgba(255,190,207,.2), transparent 30rem),
+                radial-gradient(ellipse at 94% 82%, rgba(246,194,208,.18), transparent 28rem),
+                var(--paper);
+            color: var(--plum);
+            font-family: var(--sans);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        a { color: inherit; }
+        button, input { color: inherit; font: inherit; }
+        button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid var(--rose-dark); outline-offset: 4px; }
+        ::selection { color: white; background: var(--rose-dark); }
+
+        .topbar { display: flex; min-height: 58px; align-items: center; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--line); padding: 0 clamp(18px, 5vw, 64px); background: rgba(255,255,255,.62); }
+        .back-link { color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: .1em; text-decoration: none; text-transform: uppercase; }
+        .back-link:hover { color: var(--rose-dark); }
+        .topbar-note { color: var(--rose-dark); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
+        .eyebrow { margin: 0 0 13px; color: var(--rose-dark); font-size: 10px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; }
+        h1, h2 { margin: 0; font-family: var(--serif); font-weight: 500; }
+        h1 { max-width: 720px; font-size: clamp(2.65rem, 5.5vw, 4.3rem); line-height: .96; }
+
+        main { padding: 0 20px; }
+        .archive { width: min(920px, 100%); margin: 0 auto; padding: clamp(58px, 8vw, 94px) 0 80px; }
+        .archive-heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 26px; }
+        .archive-heading h1 { font-size: clamp(2.3rem, 5vw, 3.7rem); line-height: .98; }
+        .archive-intro { max-width: 490px; margin: 11px 0 0; color: var(--muted); font-size: 13px; }
+        .counter { flex: 0 0 auto; color: var(--rose-dark); font-family: var(--serif); font-size: clamp(1.8rem, 4vw, 2.8rem); line-height: 1; }
+        .controls { display: flex; align-items: end; margin: 28px 0 14px; }
+        .jump-field { display: grid; width: min(320px, 100%); gap: 6px; }
+        .jump-field label { color: var(--muted); font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+        .jump-box input { width: 100%; height: 44px; border: 1px solid rgba(126,56,82,.2); border-radius: 3px; background: rgba(255,255,255,.78); }
+        .jump-box input::placeholder { color: #a48b96; }
+        .jump-box { display: flex; gap: 7px; }
+        .jump-box input { width: 106px; padding: 0 10px; }
+        .jump-box button { height: 44px; border: 1px solid var(--rose-dark); border-radius: 3px; padding: 0 14px; background: var(--rose-dark); color: white; cursor: pointer; }
+        .jump-box button:hover { background: #ad123f; }
+        .list-meta { display: flex; min-height: 34px; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 10px; }
+        .list-meta strong { color: var(--plum); font-weight: 600; }
+        .list-status { min-height: 21px; margin: 12px 0 0; color: var(--rose-dark); font-size: 11px; }
+        .notes-list { position: relative; }
+        .notes-spacer { width: 100%; pointer-events: none; }
+        .note-row { display: grid; height: var(--row-height); grid-template-columns: 58px minmax(0, 1fr); align-items: center; gap: 17px; border-bottom: 1px solid var(--line); padding: 8px 10px 8px 4px; animation: note-in .42s cubic-bezier(.2,.75,.25,1) both; animation-delay: var(--stagger, 0ms); }
+        .note-number { color: var(--rose-dark); font-size: 10px; font-variant-numeric: tabular-nums; letter-spacing: .04em; }
+        .note-message { display: -webkit-box; overflow: hidden; color: #634453; font-family: var(--serif); font-size: 1.18rem; line-height: 1.2; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+        .empty-state { padding: 48px 12px; color: var(--muted); text-align: center; }
+        .end-mark { display: grid; justify-items: center; gap: 8px; padding: 44px 16px 10px; color: var(--rose-dark); text-align: center; }
+        .end-mark span { font-size: 23px; }
+        .end-mark p { margin: 0; color: var(--muted); font-family: var(--serif); font-size: 1.3rem; }
+        footer { border-top: 1px solid var(--line); padding: 23px 20px 30px; color: var(--muted); font-size: 10px; letter-spacing: .08em; text-align: center; }
+
+        @keyframes note-in { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 620px) {
+            :root { --row-height: 80px; }
+            .topbar { min-height: 54px; padding-inline: 17px; }
+            .topbar-note { font-size: 8px; letter-spacing: .06em; }
+            main { padding-inline: 17px; }
+            .archive { padding-top: 40px; }
+            .archive-heading h1 { font-size: clamp(2.25rem, 9vw, 3.15rem); }
+            .archive-heading { align-items: flex-start; flex-direction: column; gap: 15px; }
+            .controls { gap: 12px; }
+            .jump-box input { flex: 1; width: auto; }
+            .note-row { grid-template-columns: 48px minmax(0, 1fr); gap: 11px; padding-inline: 2px; }
+            .note-message { font-size: 1.1rem; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <a class="back-link" href="../index.html">Back to our page</a>
+        <span class="topbar-note">A hundred thousand love notes</span>
+    </header>
+
+    <main>
+        <section class="archive" id="messages" aria-labelledby="archive-title">
+            <div class="archive-heading">
+                <div>
+                    <p class="eyebrow">Every single one is yours</p>
+                    <h1 id="archive-title">EVEN A BILLION I LOVE YOU WONT BE ENOUGH TO PROVE PROVE MY LOVE TO YOU</h1>
+                    <p class="archive-intro">Scroll through every note or jump straight to a message number.</p>
+                </div>
+                <p class="counter" id="total-count">Loading…</p>
+            </div>
+
+            <div class="controls">
+                <form class="jump-field" id="jump-form">
+                    <label for="jump-number">Jump to message</label>
+                    <div class="jump-box">
+                        <input id="jump-number" type="number" min="1" max="100000" placeholder="1" inputmode="numeric" disabled>
+                        <button id="jump-button" type="submit" disabled>Go</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="list-meta" aria-live="polite">
+                <span id="result-count">Preparing the messages…</span>
+                <strong id="range-count"></strong>
+            </div>
+            <p class="list-status" id="list-status" role="status" aria-live="polite"></p>
+            <div class="notes-list" id="notes-list" role="list" aria-label="Numbered love messages">
+                <div class="notes-spacer" id="top-spacer" aria-hidden="true"></div>
+                <div id="visible-notes"></div>
+                <div class="notes-spacer" id="bottom-spacer" aria-hidden="true"></div>
+            </div>
+            <div class="end-mark" id="end-mark" hidden><span aria-hidden="true">♡</span><p>Every one of these is still not enough.</p></div>
+        </section>
+    </main>
+    <footer>Made with love, all 100,000 times.</footer>
+
+    <script>
+        const ROW_HEIGHT = 82;
+        const OVERSCAN = 8;
+        const messagesUrl = "../I%20love%20you%20prema!-2.txt";
+        const jumpNumber = document.getElementById("jump-number");
+        const jumpButton = document.getElementById("jump-button");
+        const visibleNotes = document.getElementById("visible-notes");
+        const topSpacer = document.getElementById("top-spacer");
+        const bottomSpacer = document.getElementById("bottom-spacer");
+        const list = document.getElementById("notes-list");
+        const listStatus = document.getElementById("list-status");
+        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        let messages = [];
+        let matchingIndices = [];
+        let renderFrame = 0;
+        let lastRange = "";
+
+        function renderVisibleRows() {
+            renderFrame = 0;
+            if (!messages.length) return;
+            const listTop = list.getBoundingClientRect().top + window.scrollY;
+            const offset = Math.max(0, window.scrollY - listTop);
+            const visibleCount = Math.ceil(window.innerHeight / ROW_HEIGHT) + OVERSCAN * 2;
+            let start = Math.max(0, Math.floor(offset / ROW_HEIGHT) - OVERSCAN);
+            start = Math.min(start, Math.max(0, matchingIndices.length - visibleCount));
+            const end = Math.min(matchingIndices.length, start + visibleCount);
+            const rangeKey = `${start}:${end}:${matchingIndices.length}`;
+            if (rangeKey === lastRange) return;
+            lastRange = rangeKey;
+
+            topSpacer.style.height = `${start * ROW_HEIGHT}px`;
+            bottomSpacer.style.height = `${(matchingIndices.length - end) * ROW_HEIGHT}px`;
+            const fragment = document.createDocumentFragment();
+            for (let position = start; position < end; position++) {
+                const sourceIndex = matchingIndices[position];
+                const row = document.createElement("article");
+                row.className = "note-row";
+                row.setAttribute("role", "listitem");
+                row.setAttribute("aria-posinset", String(sourceIndex + 1));
+                row.setAttribute("aria-setsize", String(messages.length));
+                if (!reducedMotion) row.style.setProperty("--stagger", `${Math.min(position - start, 7) * 24}ms`);
+                const number = document.createElement("span");
+                number.className = "note-number";
+                number.textContent = `#${String(sourceIndex + 1).padStart(6, "0")}`;
+                const text = document.createElement("span");
+                text.className = "note-message";
+                text.textContent = messages[sourceIndex];
+                row.append(number, text);
+                fragment.append(row);
+            }
+            visibleNotes.replaceChildren(fragment);
+            document.getElementById("result-count").textContent = matchingIndices.length === messages.length
+                ? `${messages.length.toLocaleString()} messages`
+                : `${matchingIndices.length.toLocaleString()} matching messages`;
+            const first = matchingIndices.length ? matchingIndices[start] + 1 : 0;
+            const last = matchingIndices.length ? matchingIndices[end - 1] + 1 : 0;
+            document.getElementById("range-count").textContent = matchingIndices.length ? `#${first.toLocaleString()}–#${last.toLocaleString()}` : "";
+            document.getElementById("end-mark").hidden = matchingIndices.length !== messages.length || end !== messages.length;
+        }
+
+        function scheduleRender() {
+            if (renderFrame) return;
+            renderFrame = window.requestAnimationFrame(renderVisibleRows);
+        }
+
+        document.getElementById("jump-form").addEventListener("submit", event => {
+            event.preventDefault();
+            const line = Number(jumpNumber.value);
+            if (!Number.isInteger(line) || line < 1 || line > messages.length) {
+                listStatus.textContent = `Enter a message number from 1 to ${messages.length.toLocaleString()}.`;
+                jumpNumber.focus();
+                return;
+            }
+            lastRange = "";
+            const listTop = list.getBoundingClientRect().top + window.scrollY;
+            window.scrollTo({ top: listTop + (line - 1) * ROW_HEIGHT, behavior: reducedMotion ? "instant" : "smooth" });
+            listStatus.textContent = `Jumped to message #${String(line).padStart(6, "0")}.`;
+            scheduleRender();
+        });
+
+        window.addEventListener("scroll", scheduleRender, { passive: true });
+        window.addEventListener("resize", scheduleRender, { passive: true });
+
+        fetch(messagesUrl)
+            .then(response => {
+                if (!response.ok) throw new Error("The message file could not be loaded.");
+                return response.text();
+            })
+            .then(text => {
+                messages = text.replace(/^\uFEFF/, "").split(/\r?\n/);
+                if (messages[messages.length - 1] === "") messages.pop();
+                if (!messages.length) throw new Error("The message file is empty.");
+                matchingIndices = messages.map((_message, index) => index);
+                jumpNumber.disabled = false;
+                jumpButton.disabled = false;
+                jumpNumber.max = String(messages.length);
+                document.getElementById("total-count").textContent = messages.length.toLocaleString();
+                listStatus.textContent = `All ${messages.length.toLocaleString()} original lines are ready.`;
+                lastRange = "";
+                renderVisibleRows();
+            })
+            .catch(() => {
+                document.getElementById("total-count").textContent = "Not loaded";
+                document.getElementById("result-count").textContent = "Messages unavailable";
+                visibleNotes.innerHTML = '<p class="empty-state">Could not load the message file. Make sure <code>I love you prema!-2.txt</code> is uploaded beside <code>index.html</code> in the site root.</p>';
+                listStatus.textContent = "Check that the full text file is included in your GitHub Pages upload.";
+            });
+    </script>
+</body>
+</html>
